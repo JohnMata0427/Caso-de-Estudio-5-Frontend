@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function ViewRegister() {
-    const params = useParams<{ ofGroup: string; id: string }>();
+    const { ofGroup, id } = useParams<{ ofGroup: string; id: string }>();
     const [data, setData] = useState<{ [key: string]: string }>({
         id: '',
     });
@@ -13,10 +13,10 @@ export default function ViewRegister() {
 
     useEffect(() => {
         fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/${params.ofGroup.slice(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/${ofGroup.slice(
                 0,
                 -1,
-            )}/${params.id}`,
+            )}/${id}`,
             {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -31,7 +31,7 @@ export default function ViewRegister() {
             })
             .catch((error) => console.error(error))
             .finally(() => setLoading(false));
-    }, []);
+    }, [ofGroup, id]);
 
     return (
         <div className="flex size-full flex-col">
@@ -68,6 +68,7 @@ export default function ViewRegister() {
                             width={500}
                             height={200}
                             alt="Imagen de una conferencia"
+                            priority
                         />
                     </div>
                     <div className="flex flex-col p-4">
@@ -75,8 +76,8 @@ export default function ViewRegister() {
                             if (key === 'id') {
                                 return <h1 key={key} className="mb-4 text-center text-lg font-bold">
                                 Registro de
-                                {params.ofGroup !== 'reservas'
-                                    ? `l ${params.ofGroup.slice(0, -1)}`
+                                {ofGroup !== 'reservas'
+                                    ? `l ${ofGroup.slice(0, -1)}`
                                     : ' la reserva'}{' con ID: '}
                                 {data?.id}
                             </h1>
@@ -88,14 +89,14 @@ export default function ViewRegister() {
                                         <h2 className="mt-2 text-center text-lg font-bold">
                                             {key.charAt(0).toUpperCase() +
                                                 key.slice(1) +
-                                                (params.ofGroup === 'reservas'
+                                                (ofGroup === 'reservas'
                                                     ? ''
                                                     : 's')}
                                         </h2>
                                         <CustomTable
                                             readOnly
                                             initData={
-                                                params.ofGroup === 'reservas'
+                                                ofGroup === 'reservas'
                                                     ? [data[key]]
                                                     : data[key]
                                             }

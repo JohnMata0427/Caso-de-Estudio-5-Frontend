@@ -1,6 +1,6 @@
 'use client';
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import CustomInput from '@/components/custoninput';
 import axios from 'axios';
 import CustomForm from '@/components/customform';
@@ -39,7 +39,7 @@ export default function CustomTable({
         }
     };
 
-    const getData = async () => {
+    const getData = useCallback(async () => {
         if (initData.length > 0) {
             setData(initData);
             const columnsWithoutIDS = Object.keys(initData[0]).filter(
@@ -69,11 +69,12 @@ export default function CustomTable({
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         getData();
-    }, [reload]);
+    }, [getData, initData, tableOf, reload]);
+
 
     return (
         <div className={`${!readOnly && 'w-4/5'}`}>

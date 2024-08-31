@@ -4,47 +4,43 @@ import axios from 'axios';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 export default function Dashboard({
     children,
 }: Readonly<{ children: React.ReactNode }>) {
-    const activePath = usePathname().split('/')[2];
-    const paths = ['conferencistas', 'auditorios', 'reservas'];
+	const [perfil, setPerfil] = useState({ nombre: '', apellido: '', email: '' });
     const [authenticated, setAuthenticated] = useState(false);
 
-    const [perfil, setPerfil] = useState({
-        nombre: '',
-        apellido: '',
-        email: '',
-    });
+    const paths = useMemo(() => ['conferencistas', 'auditorios', 'reservas'], []);
+	const activePath = usePathname().split('/')[2];
 
     if (!paths.includes(activePath)) return;
 
     useEffect(() => {
-		const getProfile = async () => {
-			try {
-				const response = await axios.get(
-					`${process.env.NEXT_PUBLIC_BACKEND_URL}/perfil`,
-					{
-						headers: {
-							Authorization: `Bearer ${localStorage.getItem('token')}`,
-						},
-					},
-				);
-				setPerfil(response.data);
-				setAuthenticated(true);
-			} catch (error) {
-				localStorage.removeItem('token');
-			}
-		};
-	
-		if (paths.includes(activePath)) {
-			getProfile();
-		}
-	}, [activePath, paths]);
-	
-	if (!paths.includes(activePath)) return null;	
+        const getProfile = async () => {
+            try {
+                const response = await axios.get(
+                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/perfil`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem('token')}`,
+                        },
+                    },
+                );
+                setPerfil(response.data);
+                setAuthenticated(true);
+            } catch (error) {
+                localStorage.removeItem('token');
+            }
+        };
+
+        if (paths.includes(activePath)) {
+            getProfile();
+        }
+    }, [activePath, paths]);
+
+    if (!paths.includes(activePath)) return null;
 
     return (
         <>
@@ -58,6 +54,7 @@ export default function Dashboard({
 								width={80}
 								height={80}
                                 alt="logo"
+								priority
                             />
                             {perfil.nombre ? (
                                 <div className="flex flex-col-reverse md:flex-col">
