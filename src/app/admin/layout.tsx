@@ -15,9 +15,7 @@ export default function Dashboard({
     const paths = useMemo(() => ['conferencistas', 'auditorios', 'reservas'], []);
 	const activePath = usePathname().split('/')[2];
 
-    if (!paths.includes(activePath)) return;
-
-    useEffect(() => {
+	useEffect(() => {
         const getProfile = async () => {
             try {
                 const response = await axios.get(
@@ -35,9 +33,7 @@ export default function Dashboard({
             }
         };
 
-        if (paths.includes(activePath)) {
-            getProfile();
-        }
+        if (paths.includes(activePath)) getProfile();
     }, [activePath, paths]);
 
     if (!paths.includes(activePath)) return null;

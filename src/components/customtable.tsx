@@ -69,12 +69,11 @@ export default function CustomTable({
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [initData, tableOf]);
 
     useEffect(() => {
         getData();
-    }, [getData, initData, tableOf, reload]);
-
+    }, [reload]);
 
     return (
         <div className={`${!readOnly && 'w-4/5'}`}>
