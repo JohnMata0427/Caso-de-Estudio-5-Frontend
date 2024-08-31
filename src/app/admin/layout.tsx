@@ -65,7 +65,7 @@ export default function Dashboard({
                                             Bienvenido{' '}
                                             {`${perfil.nombre} ${perfil.apellido}`}
                                         </h2>
-                                        <small className="text-neutral-400">
+                                        <small className="text-neutral-400 text-center">
                                             {perfil.email}
                                         </small>
                                     </div>

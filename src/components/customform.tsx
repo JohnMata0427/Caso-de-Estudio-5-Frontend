@@ -188,17 +188,19 @@ export default function CustomForm({ data = {} }: Readonly<{ data?: any }>) {
                                 );
                             })}
                         </div>
-                        <div className="flex items-center justify-center gap-5">
+                        <div className="flex items-center justify-center gap-4">
                             <CustomButton
                                 color="sky"
                                 loading={loading}
                                 type="submit"
-                                text="Registrar"
+                                text={data?.id ? "Actualizar" : "Registrar"}
+								className="w-24"
                             />
                             <CustomButton
                                 color="neutral"
                                 onClick={() => setShowModal(false)}
                                 text="Cancelar"
+								className="w-24"
                             />
                         </div>
                     </form>

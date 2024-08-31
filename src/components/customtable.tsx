@@ -17,7 +17,6 @@ export default function CustomTable({
     const tableOf = table || ofGroup;
 
     const [data, setData] = useState([...initData]);
-    const [reload, setReload] = useState(false);
     const [columns, setColumns] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -33,7 +32,7 @@ export default function CustomTable({
                     },
                 },
             );
-            setReload(!reload);
+            window.location.reload();
         } catch (error) {
             console.error(error);
         }
@@ -73,7 +72,7 @@ export default function CustomTable({
 
     useEffect(() => {
         getData();
-    }, [reload]);
+    }, []);
 
     return (
         <div className={`${!readOnly && 'w-4/5'}`}>
@@ -94,7 +93,7 @@ export default function CustomTable({
                                     const search = target.value.toLowerCase();
 
                                     if (search === '')
-                                        return setReload(!reload);
+                                        window.location.reload();
 
                                     const filteredData = data.filter((row) =>
                                         Object.values(row).some((value) =>
