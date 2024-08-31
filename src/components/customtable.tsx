@@ -13,7 +13,8 @@ export default function CustomTable({
     readOnly = false,
     table,
 }: Readonly<{ initData?: any[]; readOnly?: boolean; table?: string }>) {
-    const tableOf = table || useParams<{ ofGroup: Params }>().ofGroup;
+    const { ofGroup } = useParams<{ ofGroup: Params }>();
+    const tableOf = table || ofGroup;
 
     const [data, setData] = useState([...initData]);
     const [reload, setReload] = useState(false);

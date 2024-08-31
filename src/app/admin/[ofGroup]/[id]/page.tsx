@@ -1,5 +1,6 @@
 'use client';
 import CustomTable from '@/components/customtable';
+import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -61,16 +62,18 @@ export default function ViewRegister() {
             ) : data?.id ? (
                 <div className="flex flex-col">
                     <div className="h-56 w-full">
-                        <img
+                        <Image
                             className="size-full rounded-lg object-cover"
                             src="/conference-banner.webp"
+                            width={500}
+                            height={200}
                             alt="Imagen de una conferencia"
                         />
                     </div>
                     <div className="flex flex-col p-4">
                         {Object.keys(data).map((key) => {
                             if (key === 'id') {
-                                return <h1 className="mb-4 text-center text-lg font-bold">
+                                return <h1 key={key} className="mb-4 text-center text-lg font-bold">
                                 Registro de
                                 {params.ofGroup !== 'reservas'
                                     ? `l ${params.ofGroup.slice(0, -1)}`
@@ -81,7 +84,7 @@ export default function ViewRegister() {
 
                             if (typeof data[key] === 'object') {
                                 return (
-                                    <>
+                                    <div className="flex flex-col" key={key}>
                                         <h2 className="mt-2 text-center text-lg font-bold">
                                             {key.charAt(0).toUpperCase() +
                                                 key.slice(1) +
@@ -90,7 +93,6 @@ export default function ViewRegister() {
                                                     : 's')}
                                         </h2>
                                         <CustomTable
-                                            key={key}
                                             readOnly
                                             initData={
                                                 params.ofGroup === 'reservas'
@@ -101,7 +103,7 @@ export default function ViewRegister() {
                                                 key.toLocaleLowerCase() + 's'
                                             }
                                         />
-                                    </>
+                                    </div>
                                 );
                             }
 

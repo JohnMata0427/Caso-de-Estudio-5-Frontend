@@ -1,6 +1,7 @@
 'use client';
 import CustomButton from '@/components/custombutton';
 import axios from 'axios';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -20,26 +21,30 @@ export default function Dashboard({
 
     if (!paths.includes(activePath)) return;
 
-    const getProfile = async () => {
-        try {
-            const response = await axios.get(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}/perfil`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`,
-                    },
-                },
-            );
-            setPerfil(response.data);
-            setAuthenticated(true);
-        } catch (error) {
-            localStorage.removeItem('token');
-        }
-    };
-
     useEffect(() => {
-        getProfile();
-    }, []);
+		const getProfile = async () => {
+			try {
+				const response = await axios.get(
+					`${process.env.NEXT_PUBLIC_BACKEND_URL}/perfil`,
+					{
+						headers: {
+							Authorization: `Bearer ${localStorage.getItem('token')}`,
+						},
+					},
+				);
+				setPerfil(response.data);
+				setAuthenticated(true);
+			} catch (error) {
+				localStorage.removeItem('token');
+			}
+		};
+	
+		if (paths.includes(activePath)) {
+			getProfile();
+		}
+	}, [activePath, paths]);
+	
+	if (!paths.includes(activePath)) return null;	
 
     return (
         <>
@@ -47,9 +52,11 @@ export default function Dashboard({
                 <main className="flex min-h-screen flex-col bg-primary p-4 md:h-screen md:flex-row">
                     <header className="min-h-1/4 flex flex-col pb-4 md:h-full md:w-1/5 md:gap-14 md:py-8 md:pl-8 md:pr-12">
                         <div className="flex items-start justify-center gap-8 md:min-h-40 md:flex-col md:items-center md:justify-start md:gap-2">
-                            <img
-                                className="h-auto max-w-20 rounded-lg"
+                            <Image
+                                className="rounded-lg"
                                 src="/profile.webp"
+								width={80}
+								height={80}
                                 alt="logo"
                             />
                             {perfil.nombre ? (
