@@ -20,7 +20,7 @@ export default function CustomInput({
     minLength?: number;
     maxLength?: number;
     value?: string;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
     className?: string;
 }>) {
     const inputColorsClass: Record<Color, [string, string]> = {
@@ -50,8 +50,7 @@ export default function CustomInput({
             <label
                 className={`absolute start-2.5 top-4 z-10 origin-[0] -translate-y-4 scale-75 transform cursor-text select-none text-sm text-neutral-700 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-invalid:text-red-500 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:peer-invalid:text-red-500 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 ${inputColorsClass[color][1]}`}
                 onClick={() => {
-                    const input = document.getElementById(name);
-                    if (input) input.focus();
+                    document.getElementById(name)?.focus();
                 }}
             >
                 {text}

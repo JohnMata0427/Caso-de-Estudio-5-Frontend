@@ -1,21 +1,30 @@
 'use client';
 import CustomButton from '@/components/custombutton';
+import { capitalize } from '@/helpers/helper';
 import axios from 'axios';
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 
 export default function Dashboard({
     children,
 }: Readonly<{ children: React.ReactNode }>) {
-	const [perfil, setPerfil] = useState({ nombre: '', apellido: '', email: '' });
+    const router = useRouter();
+    const [perfil, setPerfil] = useState({
+        nombre: '',
+        apellido: '',
+        email: '',
+    });
     const [authenticated, setAuthenticated] = useState(false);
 
-    const paths = useMemo(() => ['conferencistas', 'auditorios', 'reservas'], []);
-	const activePath = usePathname().split('/')[2];
+    const paths = useMemo(
+        () => ['conferencistas', 'auditorios', 'reservas'],
+        [],
+    );
+    const activePath = usePathname().split('/')[2];
 
-	useEffect(() => {
+    useEffect(() => {
         const getProfile = async () => {
             try {
                 const response = await axios.get(
@@ -42,15 +51,15 @@ export default function Dashboard({
         <>
             {authenticated && (
                 <main className="flex min-h-screen flex-col bg-primary p-4 md:h-screen md:flex-row">
-                    <header className="min-h-1/4 flex flex-col pb-4 md:h-full md:w-1/5 md:gap-14 md:py-8 md:pl-8 md:pr-12">
+                    <header className="flex flex-col overflow-auto pb-4 md:h-screen md:w-1/5 md:gap-14 md:py-8 md:pl-8 md:pr-12">
                         <div className="flex items-start justify-center gap-8 md:min-h-40 md:flex-col md:items-center md:justify-start md:gap-2">
                             <Image
                                 className="rounded-lg"
                                 src="/profile.webp"
-								width={80}
-								height={80}
+                                width={80}
+                                height={80}
                                 alt="logo"
-								priority
+                                priority
                             />
                             {perfil.nombre ? (
                                 <div className="flex flex-col-reverse md:flex-col">
@@ -62,10 +71,9 @@ export default function Dashboard({
                                     </div>
                                     <div className="flex flex-col justify-center">
                                         <h2 className="text-center font-bold text-white">
-                                            Bienvenido{' '}
-                                            {`${perfil.nombre} ${perfil.apellido}`}
+                                            {`Bienvenido ${perfil.nombre} ${perfil.apellido}`}
                                         </h2>
-                                        <small className="text-neutral-400 text-center">
+                                        <small className="text-center text-neutral-400">
                                             {perfil.email}
                                         </small>
                                     </div>
@@ -89,29 +97,34 @@ export default function Dashboard({
                                                     ? 'white'
                                                     : 'primary'
                                             }
-                                            text={
-                                                path.charAt(0).toUpperCase() +
-                                                path.slice(1)
-                                            }
+                                            text={capitalize(path)}
                                             className="min-w-40 border-white"
                                         />
                                     </Link>
                                 ))}
                             </ul>
                         </nav>
-                        <div className="flex justify-center">
+                        <div className="flex flex-row items-center justify-center gap-4 md:flex-col">
+                            <CustomButton
+                                color="sky"
+                                text="Perfil"
+                                onClick={() => {
+                                    router.push('/admin/perfil');
+                                }}
+                                className="min-w-40"
+                            />
                             <CustomButton
                                 color="red"
                                 text="Cerrar sesión"
                                 onClick={() => {
                                     localStorage.removeItem('token');
-                                    window.location.href = '/auth/login';
+                                    router.push('/auth/login');
                                 }}
                                 className="min-w-40"
                             />
                         </div>
                     </header>
-                    <div className="relative flex h-3/4 flex-col items-center justify-center rounded-lg bg-white p-4 md:h-full md:w-4/5 md:overflow-auto">
+                    <div className="min-h-3/4 relative flex flex-col items-center justify-center rounded-lg bg-white p-4 md:h-full md:w-4/5 md:overflow-auto">
                         {children}
                     </div>
                 </main>

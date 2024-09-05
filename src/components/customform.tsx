@@ -6,8 +6,12 @@ import CustomInput from './custoninput';
 import CustomButton from './custombutton';
 import axios from 'axios';
 import { EditIcon } from './icons';
-
-type Params = 'conferencistas' | 'auditorios' | 'reservas';
+import {
+    capitalize,
+    separateAndCapitalize,
+    singularize,
+    type Params,
+} from '@/helpers/helper';
 
 export default function CustomForm({ data = {} }: Readonly<{ data?: any }>) {
     const formOf = useParams<{ ofGroup: Params }>().ofGroup;
@@ -44,10 +48,12 @@ export default function CustomForm({ data = {} }: Readonly<{ data?: any }>) {
     const [loading, setLoading] = useState(false);
     const [showModal, setShowModal] = useState(false);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = ({
+        target,
+    }: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setForm({
             ...form,
-            [e.target.name]: e.target.value,
+            [target.name]: target.value,
         });
     };
 
@@ -57,29 +63,23 @@ export default function CustomForm({ data = {} }: Readonly<{ data?: any }>) {
 
         setLoading(true);
         try {
+            const options = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            };
+
             data?.id
                 ? await axios.put(
-                      `${process.env.NEXT_PUBLIC_BACKEND_URL}/${formOf.slice(
-                          0,
-                          -1,
-                      )}/${data?.id}`,
+                      `${process.env.NEXT_PUBLIC_BACKEND_URL}/${singularize(formOf)}/${data?.id}`,
                       form,
-                      {
-                          headers: {
-                              'Content-Type': 'application/json',
-                              Authorization: `Bearer ${localStorage.getItem('token')}`,
-                          },
-                      },
+                      options,
                   )
                 : await axios.post(
                       `${process.env.NEXT_PUBLIC_BACKEND_URL}/${formOf}`,
                       form,
-                      {
-                          headers: {
-                              'Content-Type': 'application/json',
-                              Authorization: `Bearer ${localStorage.getItem('token')}`,
-                          },
-                      },
+                      options,
                   );
             setShowModal(false);
             window.location.reload();
@@ -109,8 +109,7 @@ export default function CustomForm({ data = {} }: Readonly<{ data?: any }>) {
                         onSubmit={handleSubmit}
                     >
                         <h2 className="text-center text-lg font-bold text-gray-900">
-                            Registro de{' '}
-                            {formOf.charAt(0).toUpperCase() + formOf.slice(1)}
+                            {`Registro de ${capitalize(formOf)}`}
                         </h2>
                         <div className="grid grid-cols-2 place-content-center gap-x-8 gap-y-2">
                             {Object.keys(fields[formOf]).map((field) => {
@@ -120,18 +119,11 @@ export default function CustomForm({ data = {} }: Readonly<{ data?: any }>) {
                                             key={field}
                                             name={field}
                                             className="w-full appearance-none rounded-lg border-0 border-b-2 border-neutral-700 bg-gray-50 p-2.5 pt-5 text-sm font-bold text-gray-900 focus:outline-none focus:ring-0"
-                                            onChange={(e) => {
-                                                setForm({
-                                                    ...form,
-                                                    [field]: e.target.value,
-                                                });
-                                            }}
+                                            onChange={handleChange}
                                             value={form[field]}
                                         >
                                             <option value="">
-                                                Seleccionar{' '}
-                                                {field.charAt(0).toUpperCase() +
-                                                    field.slice(1)}
+                                                {`Seleccione el ${field}`}
                                             </option>
                                             <option value="Masculino">
                                                 Masculino
@@ -148,20 +140,8 @@ export default function CustomForm({ data = {} }: Readonly<{ data?: any }>) {
                                         color="sky"
                                         text={
                                             !field.includes('_')
-                                                ? field
-                                                      .charAt(0)
-                                                      .toUpperCase() +
-                                                  field.slice(1)
-                                                : field
-                                                      .split('_')
-                                                      .map(
-                                                          (word) =>
-                                                              word
-                                                                  .charAt(0)
-                                                                  .toUpperCase() +
-                                                              word.slice(1),
-                                                      )
-                                                      .join(' ')
+                                                ? capitalize(field)
+                                                : separateAndCapitalize(field)
                                         }
                                         error="El campo es requerido"
                                         type={fields[formOf][field]}
@@ -193,14 +173,14 @@ export default function CustomForm({ data = {} }: Readonly<{ data?: any }>) {
                                 color="sky"
                                 loading={loading}
                                 type="submit"
-                                text={data?.id ? "Actualizar" : "Registrar"}
-								className="w-24"
+                                text={data?.id ? 'Actualizar' : 'Registrar'}
+                                className="w-24"
                             />
                             <CustomButton
                                 color="neutral"
                                 onClick={() => setShowModal(false)}
                                 text="Cancelar"
-								className="w-24"
+                                className="w-24"
                             />
                         </div>
                     </form>

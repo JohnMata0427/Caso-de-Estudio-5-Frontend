@@ -3,9 +3,11 @@
 import CustomButton from '@/components/custombutton';
 import CustomInput from '@/components/custoninput';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function LoginPage() {
+    const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [form, setForm] = useState({
         email: '',
@@ -16,12 +18,14 @@ export default function LoginPage() {
         e.preventDefault();
         setLoading(true);
         try {
-            const { data } = await axios.post(
+            const {
+                data: { token },
+            } = await axios.post(
                 `${process.env.NEXT_PUBLIC_BACKEND_URL}/login`,
                 form,
             );
-            localStorage.setItem('token', data.token);
-            window.location.href = '/admin/conferencistas';
+            localStorage.setItem('token', token);
+            router.push('/admin/conferencistas');
         } catch (error) {
             console.error(error);
         } finally {
@@ -29,10 +33,10 @@ export default function LoginPage() {
         }
     };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
         setForm({
             ...form,
-            [e.target.name]: e.target.value,
+            [target.name]: target.value,
         });
     };
 

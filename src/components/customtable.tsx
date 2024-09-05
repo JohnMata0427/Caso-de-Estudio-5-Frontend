@@ -1,18 +1,24 @@
 'use client';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import CustomInput from '@/components/custoninput';
 import axios from 'axios';
 import CustomForm from '@/components/customform';
-import { DeleteIcon, InfoIcon } from '@/components/icons';
-
-type Params = 'conferencistas' | 'auditorios' | 'reservas';
+import { DeleteIcon, InfoIcon, LoadingIcon } from '@/components/icons';
+import {
+    capitalize,
+    separateAndCapitalize,
+    singularize,
+    type Params,
+} from '@/helpers/helper';
 
 export default function CustomTable({
     initData = [],
     readOnly = false,
     table,
 }: Readonly<{ initData?: any[]; readOnly?: boolean; table?: string }>) {
+    const router = useRouter();
+
     const { ofGroup } = useParams<{ ofGroup: Params }>();
     const tableOf = table || ofGroup;
 
@@ -20,19 +26,37 @@ export default function CustomTable({
     const [columns, setColumns] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
 
+    const columnsWithoutIDS = (data: any[]) =>
+        Object.keys(data).filter((column) => !column.includes('id'));
+
+    const handleChangeSearch = ({
+        target,
+    }: React.ChangeEvent<HTMLInputElement>) => {
+        const search = target.value.toLowerCase();
+
+        if (search === '') return getData();
+
+        const filteredData = data.filter((row) =>
+            Object.values(row).some((value) =>
+                String(value).toLowerCase().includes(search),
+            ),
+        );
+        setData(filteredData);
+    };
+
     const handleDelete = async (id: number) => {
         if (!confirm('¿Está seguro de eliminar este registro?')) return;
 
         try {
             await axios.delete(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}/${tableOf.slice(0, -1)}/${id}`,
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/${singularize(tableOf)}/${id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem('token')}`,
                     },
                 },
             );
-            window.location.reload();
+            setData(data.filter((row) => row.id !== id));
         } catch (error) {
             console.error(error);
         }
@@ -40,11 +64,7 @@ export default function CustomTable({
 
     const getData = useCallback(async () => {
         if (initData.length > 0) {
-            setData(initData);
-            const columnsWithoutIDS = Object.keys(initData[0]).filter(
-                (column) => !column.includes('id'),
-            );
-            setColumns([...columnsWithoutIDS, 'Más información']);
+            setColumns([...columnsWithoutIDS(initData[0]), 'Acciones']);
             setLoading(false);
             return;
         }
@@ -59,10 +79,7 @@ export default function CustomTable({
                 },
             );
             setData(response.data);
-            const columnsWithoutIDS = Object.keys(response.data[0]).filter(
-                (column) => !column.includes('id'),
-            );
-            setColumns([...columnsWithoutIDS, 'Acciones']);
+            setColumns([...columnsWithoutIDS(response.data[0]), 'Acciones']);
         } catch (error) {
             console.error(error);
         } finally {
@@ -89,21 +106,7 @@ export default function CustomTable({
                                 error=""
                                 type="text"
                                 name="search"
-                                onChange={({ target }) => {
-                                    const search = target.value.toLowerCase();
-
-                                    if (search === '')
-                                        window.location.reload();
-
-                                    const filteredData = data.filter((row) =>
-                                        Object.values(row).some((value) =>
-                                            String(value)
-                                                .toLowerCase()
-                                                .includes(search),
-                                        ),
-                                    );
-                                    setData(filteredData);
-                                }}
+                                onChange={handleChangeSearch}
                                 className="pr-8"
                             />
                             <svg
@@ -127,26 +130,7 @@ export default function CustomTable({
             <div className="mt-4 flex max-h-96 min-h-24 overflow-auto">
                 {loading ? (
                     <div className="m-auto flex items-center justify-center gap-x-2">
-                        <svg
-                            className="size-5 animate-spin text-black"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                        >
-                            <circle
-                                className="opacity-25"
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="currentColor"
-                                strokeWidth="4"
-                            ></circle>
-                            <path
-                                className="opacity-75"
-                                fill="currentColor"
-                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                            ></path>
-                        </svg>
+                        <LoadingIcon />
                         <p>Cargando datos...</p>
                     </div>
                 ) : data.length === 0 ? (
@@ -161,18 +145,8 @@ export default function CustomTable({
                                         className="text-nowrap border border-primary px-4 py-1"
                                     >
                                         {!column.includes('_')
-                                            ? column.charAt(0).toUpperCase() +
-                                              column.slice(1)
-                                            : column
-                                                  .split('_')
-                                                  .map(
-                                                      (word) =>
-                                                          word
-                                                              .charAt(0)
-                                                              .toUpperCase() +
-                                                          word.slice(1),
-                                                  )
-                                                  .join(' ')}
+                                            ? capitalize(column)
+                                            : separateAndCapitalize(column)}
                                     </th>
                                 ))}
                             </tr>
@@ -190,11 +164,9 @@ export default function CustomTable({
                                                     <div className="flex items-center justify-center gap-x-2">
                                                         <InfoIcon
                                                             onClick={() => {
-                                                                window.location.href =
-                                                                    '/admin/' +
-                                                                    tableOf +
-                                                                    '/' +
-                                                                    row['id'];
+                                                                router.push(
+                                                                    `/admin/${tableOf}/${row.id}`,
+                                                                );
                                                             }}
                                                         />
                                                         <CustomForm
@@ -221,11 +193,9 @@ export default function CustomTable({
                                                     <div className="grid place-content-center">
                                                         <InfoIcon
                                                             onClick={() => {
-                                                                window.location.href =
-                                                                    '/admin/' +
-                                                                    tableOf +
-                                                                    '/' +
-                                                                    row['id'];
+                                                                router.push(
+                                                                    `/admin/${tableOf}/${row.id}`,
+                                                                );
                                                             }}
                                                         />
                                                     </div>
