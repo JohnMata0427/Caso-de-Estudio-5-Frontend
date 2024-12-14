@@ -1,6 +1,8 @@
 'use client';
-import axios from 'axios';
+
 import { useEffect, useState } from 'react';
+import { NEXT_PUBLIC_BACKEND_URL } from '@/app/layout';
+import axios from 'axios';
 
 export default function ProfilePage() {
     const [perfil, setPerfil] = useState({
@@ -13,7 +15,7 @@ export default function ProfilePage() {
         const getProfile = async () => {
             try {
                 const response = await axios.get(
-                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/perfil`,
+                    `${NEXT_PUBLIC_BACKEND_URL}/perfil`,
                     {
                         headers: {
                             Authorization: `Bearer ${localStorage.getItem('token')}`,

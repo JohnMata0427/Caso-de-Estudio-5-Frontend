@@ -14,7 +14,7 @@ export default function CustomInput({
 }: Readonly<{
     color?: Color;
     text: string;
-    error: string;
+    error?: string;
     type: string;
     name: string;
     minLength?: number;

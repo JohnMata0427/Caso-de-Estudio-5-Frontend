@@ -1,14 +1,17 @@
 'use client';
-import CustomTable from '@/components/customtable';
+
 import { LoadingIcon } from '@/components/icons';
 import {
     capitalize,
     separateAndCapitalize,
     singularize,
 } from '@/helpers/helper';
-import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { NEXT_PUBLIC_BACKEND_URL } from '@/app/layout';
+import CustomTable from '@/components/customtable';
+import Image from 'next/image';
+import axios from 'axios';
 
 export default function ViewRegister() {
     const { ofGroup, id } = useParams<{ ofGroup: string; id: string }>();
@@ -16,22 +19,26 @@ export default function ViewRegister() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/${singularize(ofGroup)}/${id}`,
-            {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                },
-            },
-        )
-            .then((response) => response.json())
-            .then((data) => {
+        const getData = async () => {
+            try {
+                const response = await axios.get(
+                    `${NEXT_PUBLIC_BACKEND_URL}/${singularize(ofGroup)}/${id}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem('token')}`,
+                        },
+                    },
+                );
                 delete data?.id_conferencista;
                 delete data?.id_auditorio;
-                setData(data);
-            })
-            .catch((error) => console.error(error))
-            .finally(() => setLoading(false));
+                setData(response.data);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        getData();
     }, [ofGroup, id]);
 
     return (
@@ -55,7 +62,7 @@ export default function ViewRegister() {
                     </div>
                     <div className="flex flex-col p-4">
                         {Object.keys(data).map((key) => {
-                            if (key === 'id') {
+                            if (key === 'id')
                                 return (
                                     <h1
                                         key={key}
@@ -64,16 +71,13 @@ export default function ViewRegister() {
                                         {`Registro de${ofGroup !== 'reservas' ? `l ${singularize(ofGroup)}` : ' la reserva'} con ID: ${data?.id}`}
                                     </h1>
                                 );
-                            }
 
-                            if (typeof data[key] === 'object') {
+                            if (typeof data[key] === 'object')
                                 return (
                                     <div className="flex flex-col" key={key}>
                                         <h2 className="mt-2 text-center text-lg font-bold">
                                             {capitalize(key) +
-                                                (ofGroup === 'reservas'
-                                                    ? ''
-                                                    : 's')}
+                                                (ofGroup !== 'reservas' && 's')}
                                         </h2>
                                         <CustomTable
                                             readOnly
@@ -86,7 +90,6 @@ export default function ViewRegister() {
                                         />
                                     </div>
                                 );
-                            }
 
                             return (
                                 <p key={key}>

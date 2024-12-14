@@ -1,11 +1,13 @@
 'use client';
-import CustomButton from '@/components/custombutton';
+
 import { capitalize } from '@/helpers/helper';
-import axios from 'axios';
-import Image from 'next/image';
-import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
+import { NEXT_PUBLIC_BACKEND_URL } from '@/app/layout';
+import CustomButton from '@/components/custombutton';
+import Image from 'next/image';
+import Link from 'next/link';
+import axios from 'axios';
 
 export default function Dashboard({
     children,
@@ -28,7 +30,7 @@ export default function Dashboard({
         const getProfile = async () => {
             try {
                 const response = await axios.get(
-                    `${process.env.NEXT_PUBLIC_BACKEND_URL}/perfil`,
+                    `${NEXT_PUBLIC_BACKEND_URL}/perfil`,
                     {
                         headers: {
                             Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -42,14 +44,12 @@ export default function Dashboard({
             }
         };
 
-        if (paths.includes(activePath)) getProfile();
+        paths.includes(activePath) && getProfile();
     }, [activePath, paths]);
-
-    if (!paths.includes(activePath)) return null;
 
     return (
         <>
-            {authenticated && (
+            {paths.includes(activePath) && authenticated && (
                 <main className="flex min-h-screen flex-col bg-primary p-4 md:h-screen md:flex-row">
                     <header className="flex flex-col overflow-auto pb-4 md:h-screen md:w-1/5 md:gap-14 md:py-8 md:pl-8 md:pr-12">
                         <div className="flex items-start justify-center gap-8 md:min-h-40 md:flex-col md:items-center md:justify-start md:gap-2">

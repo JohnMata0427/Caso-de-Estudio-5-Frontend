@@ -1,9 +1,7 @@
 'use client';
+
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
-import CustomInput from '@/components/custoninput';
-import axios from 'axios';
-import CustomForm from '@/components/customform';
 import { DeleteIcon, InfoIcon, LoadingIcon } from '@/components/icons';
 import {
     capitalize,
@@ -11,12 +9,17 @@ import {
     singularize,
     type Params,
 } from '@/helpers/helper';
+import { NEXT_PUBLIC_BACKEND_URL } from '@/app/layout';
+import CustomInput from '@/components/custoninput';
+import CustomForm from '@/components/customform';
+import axios from 'axios';
 
 export default function CustomTable({
     initData = [],
     readOnly = false,
     table,
 }: Readonly<{ initData?: any[]; readOnly?: boolean; table?: string }>) {
+    const token = localStorage.getItem('token');
     const router = useRouter();
 
     const { ofGroup } = useParams<{ ofGroup: Params }>();
@@ -34,7 +37,7 @@ export default function CustomTable({
     }: React.ChangeEvent<HTMLInputElement>) => {
         const search = target.value.toLowerCase();
 
-        if (search === '') return getData();
+        if (!search) return getData();
 
         const filteredData = data.filter((row) =>
             Object.values(row).some((value) =>
@@ -49,10 +52,10 @@ export default function CustomTable({
 
         try {
             await axios.delete(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}/${singularize(tableOf)}/${id}`,
+                `${NEXT_PUBLIC_BACKEND_URL}/${singularize(tableOf)}/${id}`,
                 {
                     headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                        Authorization: `Bearer ${token}`,
                     },
                 },
             );
@@ -71,10 +74,10 @@ export default function CustomTable({
 
         try {
             const response = await axios.get(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}/${tableOf}`,
+                `${NEXT_PUBLIC_BACKEND_URL}/${tableOf}`,
                 {
                     headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                        Authorization: `Bearer ${token}`,
                     },
                 },
             );
@@ -103,7 +106,6 @@ export default function CustomTable({
                             <CustomInput
                                 color="neutral"
                                 text={`Buscar ${tableOf}`}
-                                error=""
                                 type="text"
                                 name="search"
                                 onChange={handleChangeSearch}
@@ -155,7 +157,7 @@ export default function CustomTable({
                             {data.map((row, index) => (
                                 <tr key={index}>
                                     {columns.map((column) => {
-                                        if (column === 'Acciones') {
+                                        if (column === 'Acciones')
                                             return (
                                                 <td
                                                     key={column}
@@ -182,9 +184,8 @@ export default function CustomTable({
                                                     </div>
                                                 </td>
                                             );
-                                        }
 
-                                        if (column === 'Más información') {
+                                        if (column === 'Más información')
                                             return (
                                                 <td
                                                     key={column}
@@ -201,7 +202,6 @@ export default function CustomTable({
                                                     </div>
                                                 </td>
                                             );
-                                        }
 
                                         return (
                                             <td

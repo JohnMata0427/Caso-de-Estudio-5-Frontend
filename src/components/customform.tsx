@@ -2,9 +2,6 @@
 
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
-import CustomInput from './custoninput';
-import CustomButton from './custombutton';
-import axios from 'axios';
 import { EditIcon } from './icons';
 import {
     capitalize,
@@ -12,6 +9,10 @@ import {
     singularize,
     type Params,
 } from '@/helpers/helper';
+import { NEXT_PUBLIC_BACKEND_URL } from '@/app/layout';
+import CustomInput from './custoninput';
+import CustomButton from './custombutton';
+import axios from 'axios';
 
 export default function CustomForm({ data = {} }: Readonly<{ data?: any }>) {
     const formOf = useParams<{ ofGroup: Params }>().ofGroup;
@@ -44,7 +45,7 @@ export default function CustomForm({ data = {} }: Readonly<{ data?: any }>) {
         },
     };
 
-    const [form, setForm] = useState({ ...data });
+    const [form, setForm] = useState(data);
     const [loading, setLoading] = useState(false);
     const [showModal, setShowModal] = useState(false);
 
@@ -72,12 +73,12 @@ export default function CustomForm({ data = {} }: Readonly<{ data?: any }>) {
 
             data?.id
                 ? await axios.put(
-                      `${process.env.NEXT_PUBLIC_BACKEND_URL}/${singularize(formOf)}/${data?.id}`,
+                      `${NEXT_PUBLIC_BACKEND_URL}/${singularize(formOf)}/${data?.id}`,
                       form,
                       options,
                   )
                 : await axios.post(
-                      `${process.env.NEXT_PUBLIC_BACKEND_URL}/${formOf}`,
+                      `${NEXT_PUBLIC_BACKEND_URL}/${formOf}`,
                       form,
                       options,
                   );
@@ -113,7 +114,7 @@ export default function CustomForm({ data = {} }: Readonly<{ data?: any }>) {
                         </h2>
                         <div className="grid grid-cols-2 place-content-center gap-x-8 gap-y-2">
                             {Object.keys(fields[formOf]).map((field) => {
-                                if (field === 'genero') {
+                                if (field === 'genero')
                                     return (
                                         <select
                                             key={field}
@@ -122,7 +123,7 @@ export default function CustomForm({ data = {} }: Readonly<{ data?: any }>) {
                                             onChange={handleChange}
                                             value={form[field]}
                                         >
-                                            <option value="">
+                                            <option>
                                                 {`Seleccione el ${field}`}
                                             </option>
                                             <option value="Masculino">
@@ -133,7 +134,6 @@ export default function CustomForm({ data = {} }: Readonly<{ data?: any }>) {
                                             </option>
                                         </select>
                                     );
-                                }
                                 return (
                                     <CustomInput
                                         key={field}

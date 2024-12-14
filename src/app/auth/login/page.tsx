@@ -1,10 +1,11 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { NEXT_PUBLIC_BACKEND_URL } from '@/app/layout';
 import CustomButton from '@/components/custombutton';
 import CustomInput from '@/components/custoninput';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 
 export default function LoginPage() {
     const router = useRouter();
@@ -20,10 +21,7 @@ export default function LoginPage() {
         try {
             const {
                 data: { token },
-            } = await axios.post(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}/login`,
-                form,
-            );
+            } = await axios.post(`${NEXT_PUBLIC_BACKEND_URL}/login`, form);
             localStorage.setItem('token', token);
             router.push('/admin/conferencistas');
         } catch (error) {
