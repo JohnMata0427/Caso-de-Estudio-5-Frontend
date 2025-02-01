@@ -11,8 +11,11 @@ import {
 } from '@/helpers/helper';
 import CustomInput from './custoninput';
 import CustomButton from './custombutton';
+import { Conferencista } from '@/interfaces/conferencista';
+import { Auditorio } from '@/interfaces/auditorio';
+import { Reserva } from '@/interfaces/reserva';
 
-export default function CustomForm({ data = {} }: Readonly<{ data?: any }>) {
+export default function CustomForm({ data = {} }: Readonly<{ data?: Conferencista | Auditorio | Reserva }>) {
   const formOf = useParams<{ ofGroup: Params }>().ofGroup;
 
   const fields: Record<Params, Record<string, string>> = {
@@ -76,9 +79,7 @@ export default function CustomForm({ data = {} }: Readonly<{ data?: any }>) {
 
       setShowModal(false);
       window.location.reload();
-    } catch (error) {
-      console.error(error);
-    } finally {
+    } catch {} finally {
       setLoading(false);
     }
   };
@@ -113,9 +114,9 @@ export default function CustomForm({ data = {} }: Readonly<{ data?: any }>) {
                       name={field}
                       className="w-full appearance-none rounded-lg border-0 border-b-2 border-neutral-700 bg-gray-50 p-2.5 pt-5 text-sm font-bold text-gray-900 focus:ring-0 focus:outline-none"
                       onChange={handleChange}
-                      value={form[field]}
+                      value={form["genero"]}
                     >
-                      <option>{`Seleccione el ${field}`}</option>
+                      <option>Seleccione el genero</option>
                       <option value="Masculino">Masculino</option>
                       <option value="Femenino">Femenino</option>
                     </select>
@@ -144,7 +145,7 @@ export default function CustomForm({ data = {} }: Readonly<{ data?: any }>) {
                     }
                     onChange={handleChange}
                     value={
-                      !field.includes('fecha')
+                      field !== 'fecha_nacimiento'
                         ? form[field]
                         : form[field]?.split('T')[0]
                     }

@@ -10,6 +10,9 @@ import {
 } from '@/helpers/helper';
 import CustomInput from '@/components/custoninput';
 import CustomForm from '@/components/customform';
+import { Conferencista } from '@/interfaces/conferencista';
+import { Auditorio } from '@/interfaces/auditorio';
+import { Reserva } from '@/interfaces/reserva';
 
 const NEXT_PUBLIC_BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -17,7 +20,11 @@ export default function CustomTable({
   initData = [],
   readOnly = false,
   table,
-}: Readonly<{ initData?: any[]; readOnly?: boolean; table?: string }>) {
+}: Readonly<{
+  initData?: Conferencista[] | Auditorio[] | Reserva[];
+  readOnly?: boolean;
+  table?: string;
+}>) {
   const token = localStorage.getItem('token');
   const router = useRouter();
 
@@ -29,8 +36,8 @@ export default function CustomTable({
   const [columns, setColumns] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const columnsWithoutIDS = (data: any[]) =>
-    Object.keys(data).filter((column) => !column.includes('id'));
+  const columnsWithoutIDS = (data: Conferencista | Auditorio | Reserva) =>
+    Object.keys(data).filter((column) => !column.startsWith('id'));
 
   const handleChangeSearch = ({
     target,
@@ -59,9 +66,7 @@ export default function CustomTable({
         },
       });
       setData(data.filter((row) => row.id !== id));
-    } catch (error) {
-      console.error(error);
-    }
+    } catch {}
   };
 
   useEffect(() => {
@@ -87,7 +92,7 @@ export default function CustomTable({
         setLoading(false);
       }
     })();
-  }, []);
+  }, [initData, tableOf, token]);
 
   return (
     <div className={`${!readOnly && 'w-4/5'}`}>
@@ -166,7 +171,7 @@ export default function CustomTable({
                             />
                             <CustomForm data={row} />
                             <DeleteIcon
-                              onClick={() => handleDelete(row['id'])}
+                              onClick={() => handleDelete(row['id']!)}
                             />
                           </div>
                         </td>

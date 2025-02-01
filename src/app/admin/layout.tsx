@@ -35,7 +35,7 @@ export default function Dashboard({
 
         setPerfil(response);
         setAuthenticated(true);
-      } catch (error) {
+      } catch {
         localStorage.removeItem('token');
       }
     };

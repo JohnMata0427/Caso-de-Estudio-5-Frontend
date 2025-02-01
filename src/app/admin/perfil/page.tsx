@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 export default function Profile() {
@@ -22,7 +23,7 @@ export default function Profile() {
         ).then((res) => res.json());
 
         setPerfil(response);
-      } catch (error) {
+      } catch {
         localStorage.removeItem('token');
       }
     };
@@ -32,7 +33,7 @@ export default function Profile() {
 
   return (
     <div className="flex flex-col items-center justify-center gap-4">
-      <img
+      <Image
         className="rounded-lg"
         src="/profile.webp"
         width={80}

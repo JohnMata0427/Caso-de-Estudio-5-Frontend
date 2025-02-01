@@ -27,9 +27,7 @@ export default function LoginPage() {
 
 			localStorage.setItem("token", token);
 			router.push("/admin/conferencistas");
-		} catch (error) {
-			console.error(error);
-		} finally {
+		} catch {} finally {
 			setLoading(false);
 		}
 	};
