@@ -16,12 +16,14 @@ import { Reserva } from '@/interfaces/reserva';
 
 const NEXT_PUBLIC_BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
+type TableType = Conferencista | Auditorio | Reserva;
+
 export default function CustomTable({
   initData = [],
   readOnly = false,
   table,
 }: Readonly<{
-  initData?: Conferencista[] | Auditorio[] | Reserva[];
+  initData?: TableType[];
   readOnly?: boolean;
   table?: string;
 }>) {
@@ -199,8 +201,12 @@ export default function CustomTable({
                         className="border-primary border px-4 py-1 text-center text-nowrap"
                       >
                         {!column.includes('fecha')
-                          ? row[column]
-                          : (row[column] as string).split('T')[0]}
+                          ? row[column as keyof TableType]
+                          : (
+                              row[
+                                column as keyof TableType
+                              ] as unknown as string
+                            ).split('T')[0]}
                       </td>
                     );
                   })}

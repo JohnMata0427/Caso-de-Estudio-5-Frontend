@@ -31,7 +31,8 @@ export default function ViewRegister() {
         delete response?.id_conferencista;
         delete response?.id_auditorio;
         setData(response);
-      } catch {} finally {
+      } catch {
+      } finally {
         setLoading(false);
       }
     };

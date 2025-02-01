@@ -15,7 +15,11 @@ import { Conferencista } from '@/interfaces/conferencista';
 import { Auditorio } from '@/interfaces/auditorio';
 import { Reserva } from '@/interfaces/reserva';
 
-export default function CustomForm({ data = {} }: Readonly<{ data?: Conferencista | Auditorio | Reserva }>) {
+type FormType = Conferencista | Auditorio | Reserva;
+
+export default function CustomForm({
+  data = {},
+}: Readonly<{ data?: FormType }>) {
   const formOf = useParams<{ ofGroup: Params }>().ofGroup;
 
   const fields: Record<Params, Record<string, string>> = {
@@ -79,7 +83,8 @@ export default function CustomForm({ data = {} }: Readonly<{ data?: Conferencist
 
       setShowModal(false);
       window.location.reload();
-    } catch {} finally {
+    } catch {
+    } finally {
       setLoading(false);
     }
   };
@@ -114,7 +119,7 @@ export default function CustomForm({ data = {} }: Readonly<{ data?: Conferencist
                       name={field}
                       className="w-full appearance-none rounded-lg border-0 border-b-2 border-neutral-700 bg-gray-50 p-2.5 pt-5 text-sm font-bold text-gray-900 focus:ring-0 focus:outline-none"
                       onChange={handleChange}
-                      value={form["genero"]}
+                      value={form['genero' as keyof FormType]}
                     >
                       <option>Seleccione el genero</option>
                       <option value="Masculino">Masculino</option>
@@ -145,9 +150,11 @@ export default function CustomForm({ data = {} }: Readonly<{ data?: Conferencist
                     }
                     onChange={handleChange}
                     value={
-                      field !== 'fecha_nacimiento'
-                        ? form[field]
-                        : form[field]?.split('T')[0]
+                      (field !== 'fecha_nacimiento'
+                        ? form[field as keyof FormType]
+                        : (
+                            form[field as keyof FormType] as unknown as string
+                          )?.split('T')[0]) as string
                     }
                   />
                 );
