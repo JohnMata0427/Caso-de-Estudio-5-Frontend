@@ -22,32 +22,31 @@ export default function Dashboard({
   const activePath = usePathname().split('/')[2];
 
   useEffect(() => {
-    const getProfile = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/perfil`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
+    if (paths.includes(activePath))
+      (async () => {
+        try {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/perfil`,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+              },
             },
-          },
-        ).then((res) => res.json());
+          ).then((res) => res.json());
 
-        setPerfil(response);
-        setAuthenticated(true);
-      } catch {
-        localStorage.removeItem('token');
-      }
-    };
-
-    paths.includes(activePath) && getProfile();
+          setPerfil(response);
+          setAuthenticated(true);
+        } catch {
+          localStorage.removeItem('token');
+        }
+      })();
   }, [activePath, paths]);
 
   return (
     <>
       {paths.includes(activePath) && authenticated && (
         <main className="bg-primary flex h-screen min-h-screen flex-col p-4 md:flex-row">
-          <header className="flex flex-col overflow-auto pb-4 md:w-1/5 md:gap-8 md:py-8 md:pr-12 md:pl-8 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-track]:rounded-full">
+          <header className="flex flex-col overflow-auto pb-4 md:w-1/5 md:gap-8 md:py-8 md:pr-12 md:pl-8 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-track]:rounded-full">
             <div className="flex items-start justify-center gap-8 md:min-h-40 md:flex-col md:items-center md:justify-start md:gap-2">
               <Image
                 className="rounded-lg"
